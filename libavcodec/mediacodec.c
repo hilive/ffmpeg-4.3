@@ -147,3 +147,45 @@ int av_mediacodec_render_buffer_at_time(AVMediaCodecBuffer *buffer, int64_t time
 }
 
 #endif
+
+static void hi_log(void* ctx, const char* tag, int lvl, const char* fmt, va_list args) {
+    char buf[1024 + 1] = {0};
+    vsnprintf(buf, 1024, fmt, args);
+
+    av_log(ctx, lvl, "[hilive]%s %s \n", tag, buf);
+}
+
+void hi_loge(void* ctx, const char* tag, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  hi_log(ctx, tag, AV_LOG_ERROR, fmt, args);
+  va_end(args);
+}
+
+void hi_logw(void* ctx, const char* tag, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  hi_log(ctx, tag, AV_LOG_WARNING, fmt, args);
+  va_end(args);
+}
+
+void hi_logi(void* ctx, const char* tag, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  hi_log(ctx, tag, AV_LOG_INFO, fmt, args);
+  va_end(args);
+}
+
+void hi_logd(void* ctx, const char* tag, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  hi_log(ctx, tag, AV_LOG_DEBUG, fmt, args);
+  va_end(args);
+}
+
+void hi_logt(void* ctx, const char* tag, const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  hi_log(ctx, tag, AV_LOG_TRACE, fmt, args);
+  va_end(args);
+}

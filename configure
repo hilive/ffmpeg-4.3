@@ -1721,7 +1721,6 @@ EXTERNAL_LIBRARY_GPL_LIST="
     libdavs2
     librubberband
     libvidstab
-    libx264
     libx265
     libxavs
     libxavs2
@@ -1787,6 +1786,7 @@ EXTERNAL_LIBRARY_LIST="
     libmp3lame
     libmysofa
     libopencv
+    libx264
     libopenh264
     libopenjpeg
     libopenmpt
@@ -3048,6 +3048,7 @@ h264_amf_encoder_deps="amf"
 h264_crystalhd_decoder_select="crystalhd h264_mp4toannexb_bsf h264_parser"
 h264_cuvid_decoder_deps="cuvid"
 h264_cuvid_decoder_select="h264_mp4toannexb_bsf"
+h264_mediacodec_encoder_deps="mediacodec"
 h264_mediacodec_decoder_deps="mediacodec"
 h264_mediacodec_decoder_select="h264_mp4toannexb_bsf h264_parser"
 h264_mf_encoder_deps="mediafoundation"

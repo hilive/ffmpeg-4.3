@@ -98,4 +98,11 @@ int av_mediacodec_release_buffer(AVMediaCodecBuffer *buffer, int render);
  */
 int av_mediacodec_render_buffer_at_time(AVMediaCodecBuffer *buffer, int64_t time);
 
+
+void hi_loge(void* ctx, const char* tag, const char* fmt, ...);
+void hi_logw(void* ctx, const char* tag, const char* fmt, ...);
+void hi_logi(void* ctx, const char* tag, const char* fmt, ...);
+void hi_logd(void* ctx, const char* tag, const char* fmt, ...);
+void hi_logt(void* ctx, const char* tag, const char* fmt, ...);
+
 #endif /* AVCODEC_MEDIACODEC_H */

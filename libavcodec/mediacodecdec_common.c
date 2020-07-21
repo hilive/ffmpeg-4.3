@@ -164,18 +164,6 @@ static enum AVColorTransferCharacteristic mcdec_get_color_trc(int color_transfer
     }
 }
 
-enum {
-    COLOR_FormatYUV420Planar                              = 0x13,
-    COLOR_FormatYUV420SemiPlanar                          = 0x15,
-    COLOR_FormatYCbYCr                                    = 0x19,
-    COLOR_FormatAndroidOpaque                             = 0x7F000789,
-    COLOR_QCOM_FormatYUV420SemiPlanar                     = 0x7fa30c00,
-    COLOR_QCOM_FormatYUV420SemiPlanar32m                  = 0x7fa30c04,
-    COLOR_QCOM_FormatYUV420PackedSemiPlanar64x32Tile2m8ka = 0x7fa30c03,
-    COLOR_TI_FormatYUV420PackedSemiPlanar                 = 0x7f000100,
-    COLOR_TI_FormatYUV420PackedSemiPlanarInterlaced       = 0x7f000001,
-};
-
 static const struct {
 
     int color_format;
