@@ -292,7 +292,7 @@ static int mediacodec_encode_send_frame(AVCodecContext* avctx, const AVFrame* fr
 
     media_status_t status = AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, 0, copy_size, pts, flags);
 
-    hi_loge(avctx, LOG_TAG, "%s %d (%d %d), buffInfo (idx: %u size: %u flags: %d) frameInfo (width: %d height: %d format: %d pts: [%lld %lld] type: %d)", __FUNCTION__, __LINE__,
+    hi_logt(avctx, LOG_TAG, "%s %d (%d %d), buffInfo (idx: %u size: %u flags: %d) frameInfo (width: %d height: %d format: %d pts: [%lld %lld] type: %d)", __FUNCTION__, __LINE__,
         ret, status, bufferIndex, bufferSize, flags, frame->width, frame->height, frame->format, frame->pts, pts, frame->pict_type);
 
     if (status != 0) {
