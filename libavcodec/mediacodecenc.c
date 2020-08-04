@@ -202,7 +202,8 @@ static av_cold int mediacodec_encode_init(AVCodecContext* avctx) {
     ctx->saw_output_eos = false;
     ctx->extradata_pop = false;
 
-    hi_logi(avctx, LOG_TAG, "init start rc_mode: %d", ctx->rc_mode);
+    hi_logi(avctx, LOG_TAG, "init start globalHdr: [%d %s] rc_mode: %d", 
+        avctx->flags, (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? "yes" : "no", ctx->rc_mode);
 
     const char* mime = "video/avc";
     ctx->codec = AMediaCodec_createEncoderByType(mime);
