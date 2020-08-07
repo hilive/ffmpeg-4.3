@@ -45,10 +45,10 @@ static const AVOption options[] = {
 };
 
 static int mediacodec_encode_header(AVCodecContext* avctx) {
+    MediaCodecEncContext* ctx = avctx->priv_data;
     int ret = AVERROR_BUG;
-    do {
-        MediaCodecEncContext* ctx = avctx->priv_data;
 
+    do {
         media_status_t status = AMEDIA_OK;
         if ((status = AMediaCodec_configure(ctx->codec, ctx->format, NULL, 0, AMEDIACODEC_CONFIGURE_FLAG_ENCODE)) != AMEDIA_OK) {
             hi_logi(avctx, LOG_TAG, "%s %d status: %d", __FUNCTION__, __LINE__, status);
@@ -75,7 +75,7 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
                 break;
             }
 
-            AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, 0, bufferSize, 0, 0)
+            AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, 0, bufferSize, 0, 0);
         }
 
         {//output buff
@@ -143,7 +143,6 @@ static av_cold int mediacodec_encode_init(AVCodecContext* avctx) {
     do {
         MediaCodecEncContext* ctx = avctx->priv_data;
         ctx->saw_output_eos = false;
-        ctx->extradata_pop = false;
 
         hi_logi(avctx, LOG_TAG, "init start globalHdr: [%d %s] rc_mode: %d", 
             avctx->flags, (avctx->flags & AV_CODEC_FLAG_GLOBAL_HEADER) ? "yes" : "no", ctx->rc_mode);
@@ -154,6 +153,8 @@ static av_cold int mediacodec_encode_init(AVCodecContext* avctx) {
             hi_loge(avctx, LOG_TAG, "AMediaFormat_new failed!");
             break;
         }
+
+        const char* mime = "video/avc";
 
         AMediaFormat_setString(ctx->format, AMEDIAFORMAT_KEY_MIME, mime);
         AMediaFormat_setInt32(ctx->format, AMEDIAFORMAT_KEY_HEIGHT, avctx->height);
@@ -167,7 +168,6 @@ static av_cold int mediacodec_encode_init(AVCodecContext* avctx) {
         const char* format_str = AMediaFormat_toString(ctx->format);
         hi_logi(avctx, LOG_TAG, "AMediaCodec_configure %s!", format_str ? format_str : "");
 
-        const char* mime = "video/avc";
         ctx->codec = AMediaCodec_createEncoderByType(mime);
 
         if (ctx->codec == NULL) {
