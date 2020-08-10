@@ -45,6 +45,9 @@ Patches should be submitted to the ffmpeg-devel mailing list using
 `git format-patch` or `git send-email`. Github pull requests should be
 avoided because they are not part of our review process and will be ignored.
 
+## ffmpeg
+base ffmpeg-4.3
+基于ffmpeg-4.3
 
 ## mediacodec
 Add hard mediacodec support
