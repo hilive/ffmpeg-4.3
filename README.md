@@ -8,3 +8,6 @@ Add hard mediacodec support
 
 ## 说明
 兼容性问题已经验证，编码后的视频ffmpeg和各系统播放器都能正常解码；也不会出现首帧异常的情况；
+
+## 编译
+编译脚本地址：https://github.com/hilive/ffmpeg-build
