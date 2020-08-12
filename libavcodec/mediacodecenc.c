@@ -49,11 +49,18 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
     int ret = AVERROR_BUG;
 
     do {
+        hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
+
+        const char* format_str = AMediaFormat_toString(ctx->format);
+        hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d AMediaCodec_configure %s", __LINE__, format_str ? format_str : "");
+
         media_status_t status = AMEDIA_OK;
         if ((status = AMediaCodec_configure(ctx->codec, ctx->format, NULL, 0, AMEDIACODEC_CONFIGURE_FLAG_ENCODE)) != AMEDIA_OK) {
             hi_logi(avctx, LOG_TAG, "%s %d status: %d", __FUNCTION__, __LINE__, status);
             break;
         }
+
+        hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
 
         status = AMediaCodec_start(ctx->codec);
         if (status != AMEDIA_OK) {
@@ -62,11 +69,15 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
         }
 
         {//input buff
+            hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
+
             ssize_t bufferIndex = AMediaCodec_dequeueInputBuffer(ctx->codec, TIMEOUT_USEC);
             if (bufferIndex < 0) {
                 hi_logd(avctx, LOG_TAG, "No input buffers available");
                 break;
             }
+
+            hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
 
             size_t bufferSize = 0;
             uint8_t* buffer = AMediaCodec_getInputBuffer(ctx->codec, bufferIndex, &bufferSize);
@@ -75,6 +86,7 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
                 break;
             }
 
+            hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
             AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, 0, bufferSize, 0, 0);
         }
 
@@ -82,16 +94,16 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
             bool got_config = false;
             int try_times = 3;
             while (try_times --) {
+                hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
+
                 AMediaCodecBufferInfo bufferInfo;
                 int buff_idx = AMediaCodec_dequeueOutputBuffer(ctx->codec, &bufferInfo, TIMEOUT_USEC);
                 if (buff_idx < 0) {
-                    if (buff_idx != AMEDIACODEC_INFO_TRY_AGAIN_LATER) {
-                        hi_logi(avctx, LOG_TAG, "AMediaCodec_dequeueOutputBuffer idx: %d", buff_idx);
-                    }
-
+                    hi_logi(avctx, LOG_TAG, "AMediaCodec_dequeueOutputBuffer idx: %d", buff_idx);
                     continue;
                 }
 
+                hi_logd(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
                 size_t outSize = 0;
                 uint8_t* outBuffer = AMediaCodec_getOutputBuffer(ctx->codec, buff_idx, &outSize);
                 if (!outBuffer) {
