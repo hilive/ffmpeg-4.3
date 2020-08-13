@@ -66,71 +66,76 @@ static int mediacodec_encode_header(AVCodecContext* avctx) {
             break;
         }
 
-        {//input buff
-            ssize_t bufferIndex = AMediaCodec_dequeueInputBuffer(ctx->codec, TIMEOUT_USEC);
-            hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d idx: %d", __LINE__, bufferIndex);
-            if (bufferIndex < 0) {
-                hi_loge(avctx, LOG_TAG, "No input buffers available");
-                break;
-            }
+        int try_times = 5;
+        bool got_config = false;
+        while (!got_config && try_times --) {
+            {//input buff
+                hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d try_times: %d", __LINE__, try_times);
 
-            size_t bufferSize = 0;
-            uint8_t* buffer = AMediaCodec_getInputBuffer(ctx->codec, bufferIndex, &bufferSize);
-            if (!buffer) {
-                hi_loge(avctx, LOG_TAG, "Cannot get input buffer!");
-                break;
-            }
-
-            int status = AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, LOCAL_BUFFER_FLAG_CODECCONFIG, bufferSize, 110, 0);
-            hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d stats: %d", __LINE__, status);
-        }
-
-        {//output buff
-            bool got_config = false;
-            int try_times = 5;
-            while (try_times --) {
-                hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d", __LINE__);
-                AMediaCodecBufferInfo bufferInfo;
-                int bufferIndex = AMediaCodec_dequeueOutputBuffer(ctx->codec, &bufferInfo, TIMEOUT_USEC);
-                hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d AMediaCodec_dequeueOutputBuffer idx: %d", __LINE__, bufferIndex);
+                ssize_t bufferIndex = AMediaCodec_dequeueInputBuffer(ctx->codec, TIMEOUT_USEC);
+                hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d idx: %d", __LINE__, bufferIndex);
                 if (bufferIndex < 0) {
-                    continue;
-                }
-
-                size_t outSize = 0;
-                uint8_t* outBuffer = AMediaCodec_getOutputBuffer(ctx->codec, bufferIndex, &outSize);
-                if (!outBuffer) {
-                    hi_loge(avctx, LOG_TAG, "AMediaCodec_getOutputBuffer failed, flags: %d idx: %d size: %u", bufferInfo.flags, bufferIndex, outSize);
-                    AMediaCodec_releaseOutputBuffer(ctx->codec, bufferIndex, false);
+                    hi_loge(avctx, LOG_TAG, "No input buffers available");
                     break;
                 }
 
-                uint8_t* data = outBuffer;
-                uint32_t dataSize = bufferInfo.size;
+                size_t bufferSize = 0;
+                uint8_t* buffer = AMediaCodec_getInputBuffer(ctx->codec, bufferIndex, &bufferSize);
+                if (!buffer) {
+                    hi_loge(avctx, LOG_TAG, "Cannot get input buffer!");
+                    break;
+                }
 
-                hi_logi(avctx, LOG_TAG, "AMediaCodec OutputBuffer idx: %d outsize: %u flags: %d offset: %d size: %d pts: %lld nalu: [%x %x %x %x %x %x]", 
-                    bufferIndex, outSize, bufferInfo.flags, bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs, data[0], data[1], data[2], data[3], data[4], data[5]);
+                int status = AMediaCodec_queueInputBuffer(ctx->codec, bufferIndex, 0, bufferSize, 0, 0);
+                hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d stats: %d", __LINE__, status);
+            }
 
-                if (bufferInfo.flags & LOCAL_BUFFER_FLAG_CODECCONFIG) {
-                    hi_logi(avctx, LOG_TAG, "Got extradata of size %d ", dataSize);
-
-                    if (!avctx->extradata) {
-                        avctx->extradata = av_mallocz(bufferInfo.size + AV_INPUT_BUFFER_PADDING_SIZE);
-                        avctx->extradata_size = bufferInfo.size;    
-                        memcpy(avctx->extradata, data, avctx->extradata_size);
+            {//output buff
+                int get_times = 3;
+                while (get_times --) {
+                    hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d get_times: %d", __LINE__, get_times);
+                    AMediaCodecBufferInfo bufferInfo;
+                    int bufferIndex = AMediaCodec_dequeueOutputBuffer(ctx->codec, &bufferInfo, TIMEOUT_USEC);
+                    hi_logi(avctx, LOG_TAG, "mediacodec_encode_header %d AMediaCodec_dequeueOutputBuffer idx: %d", __LINE__, bufferIndex);
+                    if (bufferIndex < 0) {
+                        continue;
                     }
 
-                    got_config = true;
+                    size_t outSize = 0;
+                    uint8_t* outBuffer = AMediaCodec_getOutputBuffer(ctx->codec, bufferIndex, &outSize);
+                    if (!outBuffer) {
+                        hi_loge(avctx, LOG_TAG, "AMediaCodec_getOutputBuffer failed, flags: %d idx: %d size: %u", bufferInfo.flags, bufferIndex, outSize);
+                        AMediaCodec_releaseOutputBuffer(ctx->codec, bufferIndex, false);
+                        break;
+                    }
+
+                    uint8_t* data = outBuffer;
+                    uint32_t dataSize = bufferInfo.size;
+
+                    hi_logi(avctx, LOG_TAG, "AMediaCodec OutputBuffer idx: %d outsize: %u flags: %d offset: %d size: %d pts: %lld nalu: [%x %x %x %x %x %x]", 
+                        bufferIndex, outSize, bufferInfo.flags, bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs, data[0], data[1], data[2], data[3], data[4], data[5]);
+
+                    if (bufferInfo.flags & LOCAL_BUFFER_FLAG_CODECCONFIG) {
+                        hi_logi(avctx, LOG_TAG, "Got extradata of size %d ", dataSize);
+
+                        if (!avctx->extradata) {
+                            avctx->extradata = av_mallocz(bufferInfo.size + AV_INPUT_BUFFER_PADDING_SIZE);
+                            avctx->extradata_size = bufferInfo.size;    
+                            memcpy(avctx->extradata, data, avctx->extradata_size);
+                        }
+
+                        got_config = true;
+                        AMediaCodec_releaseOutputBuffer(ctx->codec, bufferIndex, false);
+                        break;
+                    }
+
                     AMediaCodec_releaseOutputBuffer(ctx->codec, bufferIndex, false);
-                    break;
                 }
-
-                AMediaCodec_releaseOutputBuffer(ctx->codec, bufferIndex, false);
             }
+        }
 
-            if (!got_config) {
-                break;
-            }
+        if (!got_config) {
+            break;
         }
 
         ret = 0;
