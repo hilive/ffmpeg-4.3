@@ -16,4 +16,7 @@
 int ff_mediacodec_get_color_format(enum AVPixelFormat lav);
 enum AVPixelFormat ff_mediacodec_get_pix_fmt(enum FFMediaCodecColorFormat ndk);
 
+int mediacodec_encode_fill_format(AVCodecContext* avctx, AMediaFormat* format);
+int mediacodec_encode_header(AVCodecContext* avctx, AMediaFormat* format);
+
 #endif

@@ -207,6 +207,17 @@ enum FFMediaCodecColorFormat {
     COLOR_FormatSurface = 0x7f000789,
 };
 
+#define MEDIACODEC_LOG_TAG		"[ff-mediacodec]"
+
+#define MEDIACODEC_BITRATE_MODE_CQ  0 //MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CQ
+#define MEDIACODEC_BITRATE_MODE_VBR 1 //MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR
+#define MEDIACODEC_BITRATE_MODE_CBR 2 //MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_CBR
+
+#define MEDIACODEC_TIMEOUT_USEC 15000//us
+
+#define MEDIACODEC_BUFFER_FLAG_SYNCFRAME 		1
+#define MEDIACODEC_BUFFER_FLAG_CODECCONFIG 	2
+
 /*
 enum {
 	AMEDIACODEC_BUFFER_FLAG_END_OF_STREAM = 4,
