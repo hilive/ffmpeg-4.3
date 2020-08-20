@@ -138,7 +138,7 @@ int mediacodec_encode_header(AVCodecContext* avctx, AMediaFormat* format) {
                     AMediaCodecBufferInfo bufferInfo;
                     int bufferIndex = AMediaCodec_dequeueOutputBuffer(codec, &bufferInfo, MEDIACODEC_TIMEOUT_USEC);
                     if (bufferIndex < 0) {
-                        hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_dequeueOutputBuffer failed (%d)!", __FUNCTION__, __LINE__, bufferIndex);
+                        hi_logd(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_dequeueOutputBuffer failed (%d)!", __FUNCTION__, __LINE__, bufferIndex);
                         continue;
                     }
 
