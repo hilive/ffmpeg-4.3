@@ -63,7 +63,7 @@ int mediacodec_encode_fill_format(AVCodecContext* avctx, AMediaFormat* format) {
         AMediaFormat_setFloat(format, AMEDIAFORMAT_KEY_FRAME_RATE, av_q2d(avctx->framerate));
         AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_I_FRAME_INTERVAL, 1);
         AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_COLOR_FORMAT, ff_mediacodec_get_color_format(avctx->pix_fmt));
-        AMediaFormat_setInt32(format, "bitrate-mode", MEDIACODEC_BITRATE_MODE_VBR);
+        AMediaFormat_setInt32(format, "bitrate-mode", MEDIACODEC_BITRATE_MODE_CQ);//质量优先
         ret = 0;
     } while (false);
 

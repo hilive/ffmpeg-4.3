@@ -38,3 +38,4 @@
 /mapfile
 /tools/python/__pycache__/
 .vscode/c_cpp_properties.json
+.vscode/settings.json
