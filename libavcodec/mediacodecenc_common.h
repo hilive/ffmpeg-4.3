@@ -12,6 +12,15 @@
 #include "mediacodec.h"
 #include "mediacodec_wrapper.h"
 
+typedef struct MediaCodecEncContext {
+    AVClass*  avclass;
+    AMediaCodec* codec;
+    AVFrame  frame;
+    bool     saw_output_eos;
+    int rc_mode;
+    int width;
+    int height;
+} MediaCodecEncContext;
 
 int ff_mediacodec_get_color_format(enum AVPixelFormat lav);
 enum AVPixelFormat ff_mediacodec_get_pix_fmt(enum FFMediaCodecColorFormat ndk);

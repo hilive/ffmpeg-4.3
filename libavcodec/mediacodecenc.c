@@ -8,25 +8,17 @@
 #include "mediacodec_wrapper.h"
 #include "mediacodecenc_common.h"
 
+
+
 #define OFFSET(x) offsetof(MediaCodecEncContext, x)
 #define VE AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM
 
-typedef struct MediaCodecEncContext {
-    AVClass*  avclass;
-    AMediaCodec* codec;
-    AVFrame  frame;
-    bool     saw_output_eos;
-    int rc_mode;
-    int width;
-    int height;
-} MediaCodecEncContext;
-
 
 static const AVOption options[] = {
-    { "rc-mode", "The bitrate mode to use", OFFSET(rc_mode), AV_OPT_TYPE_INT, { .i64 = MEDIACODEC_BITRATE_MODE_VBR }, MEDIACODEC_BITRATE_MODE_VBR, MEDIACODEC_BITRATE_MODE_CBR, VE, "rc_mode"},
-//    { "cq", "Constant quality", 0, AV_OPT_TYPE_CONST, {.i64 = RC_MODE_CQ}, INT_MIN, INT_MAX, VE, "rc_mode" },
+    { "rc-mode", "The bitrate mode to use", OFFSET(rc_mode), AV_OPT_TYPE_INT, { .i64 = MEDIACODEC_BITRATE_MODE_VBR }, MEDIACODEC_BITRATE_MODE_CQ, MEDIACODEC_BITRATE_MODE_CBR, VE, "rc_mode"},
+    { "cq", "Constant quality", 0, AV_OPT_TYPE_CONST, {.i64 = MEDIACODEC_BITRATE_MODE_CQ}, INT_MIN, INT_MAX, VE, "rc_mode" },
     { "vbr", "Variable bitrate", 0, AV_OPT_TYPE_CONST, {.i64 = MEDIACODEC_BITRATE_MODE_VBR}, INT_MIN, INT_MAX, VE, "rc_mode" },
-    { "cbr", "Constant bitrate", 0, AV_OPT_TYPE_CONST, {.i64 = MEDIACODEC_BITRATE_MODE_VBR}, INT_MIN, INT_MAX, VE, "rc_mode" },
+    { "cbr", "Constant bitrate", 0, AV_OPT_TYPE_CONST, {.i64 = MEDIACODEC_BITRATE_MODE_CBR}, INT_MIN, INT_MAX, VE, "rc_mode" },
     { "mediacodec_output_size", "Temporary hack to support scaling on output", OFFSET(width), AV_OPT_TYPE_IMAGE_SIZE, {.i64 = 0} , 48, 3840, AV_OPT_FLAG_VIDEO_PARAM | AV_OPT_FLAG_ENCODING_PARAM },
     { NULL },
 };

@@ -43,8 +43,11 @@ enum AVPixelFormat ff_mediacodec_get_pix_fmt(enum FFMediaCodecColorFormat ndk)
 
 int mediacodec_encode_fill_format(AVCodecContext* avctx, AMediaFormat* format) {
     int ret = AVERROR_BUG;
+    MediaCodecEncContext* ctx = avctx->priv_data;
 
     do {
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d start", __FUNCTION__, __LINE__);
+
         if (!avctx || !format) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d parmas error!", __FUNCTION__, __LINE__);
             break;
@@ -63,9 +66,11 @@ int mediacodec_encode_fill_format(AVCodecContext* avctx, AMediaFormat* format) {
         AMediaFormat_setFloat(format, AMEDIAFORMAT_KEY_FRAME_RATE, av_q2d(avctx->framerate));
         AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_I_FRAME_INTERVAL, 1);
         AMediaFormat_setInt32(format, AMEDIAFORMAT_KEY_COLOR_FORMAT, ff_mediacodec_get_color_format(avctx->pix_fmt));
-        AMediaFormat_setInt32(format, "bitrate-mode", MEDIACODEC_BITRATE_MODE_CQ);//质量优先
+        AMediaFormat_setInt32(format, "bitrate-mode", ctx->rc_mode);//质量优先
         ret = 0;
     } while (false);
+
+    hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d end (%d)", __FUNCTION__, __LINE__, ret);
 
     return ret;
 }
@@ -78,15 +83,21 @@ int mediacodec_encode_header(AVCodecContext* avctx, AMediaFormat* format) {
     const char* format_str = NULL;
 
     do {
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d start", __FUNCTION__, __LINE__);
+
         if (!avctx || !format) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d parmas error!", __FUNCTION__, __LINE__);
             break;
         }
 
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaFormat_getString", __FUNCTION__, __LINE__);
+
         if (!AMediaFormat_getString(format, AMEDIAFORMAT_KEY_MIME, &mime)) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d get mime failed!", __FUNCTION__, __LINE__);
             break;
         }
+
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_createEncoderByType", __FUNCTION__, __LINE__);
 
         if (!(codec = AMediaCodec_createEncoderByType(mime))) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_createEncoderByType (%s) failed!", __FUNCTION__, __LINE__, mime);
@@ -95,12 +106,14 @@ int mediacodec_encode_header(AVCodecContext* avctx, AMediaFormat* format) {
 
         format_str = AMediaFormat_toString(format);
 
-        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d format %s", __FUNCTION__, __LINE__, format_str ? format_str : "");
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_configure format %s", __FUNCTION__, __LINE__, format_str ? format_str : "");
 
         if ((status = AMediaCodec_configure(codec, format, NULL, 0, AMEDIACODEC_CONFIGURE_FLAG_ENCODE)) != AMEDIA_OK) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_configure failed (%d)!", __FUNCTION__, __LINE__, status);
             break;
         }
+
+        hi_logi(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_start", __FUNCTION__, __LINE__);
 
         if ((status = AMediaCodec_start(codec))) {
             hi_loge(avctx, MEDIACODEC_LOG_TAG, "%s %d AMediaCodec_start failed (%d)!", __FUNCTION__, __LINE__, status);
