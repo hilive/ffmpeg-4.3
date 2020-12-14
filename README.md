@@ -1,6 +1,6 @@
 ## ffmpeg
-base ffmpeg-4.3
-基于ffmpeg-4.3
+#base ffmpeg-4.3
+#基于ffmpeg-4.3
 
 ## mediacodec
 Add hard mediacodec support
