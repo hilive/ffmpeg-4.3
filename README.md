@@ -16,5 +16,3 @@
 #### 2、mtk 的 mediacodec 实现会有些缺陷，比如复用 mediacodec 的时候，系统内部由于异步处理的状态同步有问题会导致 复用失败。所以通过每次启动都重新创建一个 mediacodec 对象来规避；
 #### 3、native 层使用 mediacodec ，发现cq 模式 的兼容性不够好，很多机型只支持 vbr 模式，不支持cq模式，这里要注意兼容下；
 
-# 编译
-#### 编译脚本地址：https://github.com/hilive/ffmpeg-build
